@@ -22,17 +22,17 @@ namespace MVCClient.Controllers
         // GET: Activities
         public async Task<IActionResult> Index(string searchString)
         {
-            var ActivitiesToSearch = from Activities in _context.Activities
+            var ActivitiesList = from Activities in _context.Activities
                                     select Activities;
 
-            ActivitiesToSearch = ActivitiesToSearch.Include(c => c.ActivityType);
-            ActivitiesToSearch = ActivitiesToSearch.Include(c => c.Customer);
+            ActivitiesList = ActivitiesList.Include(c => c.ActivityType);
+            ActivitiesList = ActivitiesList.Include(c => c.Customer);
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                ActivitiesToSearch = ActivitiesToSearch.Where(s => (s.Description.Contains(searchString)) 
+                ActivitiesList = ActivitiesList.Where(s => (s.Description.Contains(searchString)) 
                 || (s.Customer.Name.Contains(searchString)) || (s.ActivityType.Description.Contains(searchString)));
-                return View(await ActivitiesToSearch.ToListAsync());
+                return View(await ActivitiesList.ToListAsync());
             }
 
             var mVCClientContext = _context.Activities.Include(a => a.ActivityType).Include(a => a.Customer);
