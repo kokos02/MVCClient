@@ -20,10 +20,23 @@ namespace MVCClient.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var mVCClientContext = _context.Customer.Include(c => c.CustomerType);
-            return View(await mVCClientContext.ToListAsync());
+
+            var customersToSearch = from customers in _context.Customer
+                                    select customers;
+
+            customersToSearch = customersToSearch.Include(c => c.CustomerType);
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                customersToSearch = customersToSearch.Where(s => (s.Name.Contains(searchString)) 
+                || (s.Address.Contains(searchString)) || (s.CustomerType.Description.Contains(searchString)));
+            }
+
+
+            //var mVCClientContext = _context.Customer.Include(c => c.CustomerType); //initial scaffolding code
+            return View(await customersToSearch.ToListAsync());
         }
 
         // GET: Customers/Details/5

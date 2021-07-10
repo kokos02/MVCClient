@@ -20,8 +20,17 @@ namespace MVCClient.Controllers
         }
 
         // GET: Activities
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
+            var ActivitiesToSearch = from Activities in _context.Activities
+                                    select Activities;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                ActivitiesToSearch = ActivitiesToSearch.Where(s => (s.Description.Contains(searchString)));
+                return View(await ActivitiesToSearch.ToListAsync());
+            }
+
             var mVCClientContext = _context.Activities.Include(a => a.ActivityType).Include(a => a.Customer);
             return View(await mVCClientContext.ToListAsync());
         }
@@ -50,7 +59,7 @@ namespace MVCClient.Controllers
         public IActionResult Create()
         {
             ViewData["ActivityTypeId"] = new SelectList(_context.Set<ActivityType>(), "ActivityTypeId", "Description");
-            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "Address");
+            ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "Name");
             return View();
         }
 
