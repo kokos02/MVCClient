@@ -23,20 +23,20 @@ namespace MVCClient.Controllers
         public async Task<IActionResult> Index(string searchString)
         {
 
-            var customersToSearch = from customers in _context.Customer
+            var customersList = from customers in _context.Customer
                                     select customers;
 
-            customersToSearch = customersToSearch.Include(c => c.CustomerType);
+            customersList = customersList.Include(c => c.CustomerType);
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                customersToSearch = customersToSearch.Where(s => (s.Name.Contains(searchString)) 
+                customersList = customersList.Where(s => (s.Name.Contains(searchString)) 
                 || (s.Address.Contains(searchString)) || (s.CustomerType.Description.Contains(searchString)));
             }
 
 
             //var mVCClientContext = _context.Customer.Include(c => c.CustomerType); //initial scaffolding code
-            return View(await customersToSearch.ToListAsync());
+            return View(await customersList.ToListAsync());
         }
 
         // GET: Customers/Details/5
@@ -61,7 +61,7 @@ namespace MVCClient.Controllers
         // GET: Customers/Create
         public IActionResult Create()
         {
-            ViewData["CustomerTypeId"] = new SelectList(_context.Set<CustomerType>(), "CustomerTypeId", "Description");
+            ViewData["CustomerTypeId"] = new SelectList(_context.Set<CustomerTypes>(), "CustomerTypeId", "Description");
             return View();
         }
 
@@ -74,11 +74,18 @@ namespace MVCClient.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(customer);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(customer);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch
+                {
+                    return RedirectToAction("ActionFailed", "Customers");
+                }
             }
-            ViewData["CustomerTypeId"] = new SelectList(_context.Set<CustomerType>(), "CustomerTypeId", "Description", customer.CustomerTypeId);
+            ViewData["CustomerTypeId"] = new SelectList(_context.Set<CustomerTypes>(), "CustomerTypeId", "Description", customer.CustomerTypeId);
             return View(customer);
         }
 
@@ -95,7 +102,7 @@ namespace MVCClient.Controllers
             {
                 return NotFound();
             }
-            ViewData["CustomerTypeId"] = new SelectList(_context.Set<CustomerType>(), "CustomerTypeId", "Description", customer.CustomerTypeId);
+            ViewData["CustomerTypeId"] = new SelectList(_context.Set<CustomerTypes>(), "CustomerTypeId", "Description", customer.CustomerTypeId);
             return View(customer);
         }
 
@@ -131,7 +138,7 @@ namespace MVCClient.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerTypeId"] = new SelectList(_context.Set<CustomerType>(), "CustomerTypeId", "Description", customer.CustomerTypeId);
+            ViewData["CustomerTypeId"] = new SelectList(_context.Set<CustomerTypes>(), "CustomerTypeId", "Description", customer.CustomerTypeId);
             return View(customer);
         }
 
@@ -159,10 +166,22 @@ namespace MVCClient.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var customer = await _context.Customer.FindAsync(id);
-            _context.Customer.Remove(customer);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var customer = await _context.Customer.FindAsync(id);
+                _context.Customer.Remove(customer);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction("ActionFailed", "Customers");
+            }
+        }
+
+        public IActionResult ActionFailed()
+        {
+            return View();
         }
 
         private bool CustomerExists(int id)

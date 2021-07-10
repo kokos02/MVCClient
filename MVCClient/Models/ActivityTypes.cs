@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MVCClient.Models
 {
-    public class ActivityType
+    public class ActivityTypes
     {
 
         [Key]

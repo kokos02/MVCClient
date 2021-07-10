@@ -16,10 +16,10 @@ namespace MVCClient.Data
 
         public DbSet<MVCClient.Models.Customers> Customer { get; set; }
 
-        public DbSet<MVCClient.Models.CustomerType> CustomerType { get; set; }
+        public DbSet<MVCClient.Models.CustomerTypes> CustomerType { get; set; }
 
         public DbSet<MVCClient.Models.Activities> Activities { get; set; }
 
-        public DbSet<MVCClient.Models.ActivityType> ActivityType { get; set; }
+        public DbSet<MVCClient.Models.ActivityTypes> ActivityType { get; set; }
     }
 }

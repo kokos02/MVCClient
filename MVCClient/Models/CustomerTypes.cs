@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MVCClient.Models
 {
-    public class CustomerType 
+    public class CustomerTypes 
     {
         [Key]
         public int CustomerTypeId { get; set; }

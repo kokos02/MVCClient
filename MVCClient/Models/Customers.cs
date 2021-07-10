@@ -23,7 +23,7 @@ namespace MVCClient.Models
         public int CustomerTypeId { get; set; }
 
         [ForeignKey(nameof(CustomerTypeId))]
-        public virtual CustomerType CustomerType { get; set; }
+        public virtual CustomerTypes CustomerType { get; set; }
 
         public virtual ICollection<Activities> Activities { get; set; } = new HashSet<Activities>();
     }

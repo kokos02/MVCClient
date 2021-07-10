@@ -54,7 +54,7 @@ namespace MVCClient.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ActivityTypeId,Description")] ActivityType activityType)
+        public async Task<IActionResult> Create([Bind("ActivityTypeId,Description")] ActivityTypes activityType)
         {
             //If the Activity type the user tries to enter already exists we don't update the database and we just return to the index page
             if (ActivityTypeExistsByDesc(activityType.Description))
@@ -64,9 +64,16 @@ namespace MVCClient.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Add(activityType);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(activityType);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch
+                {
+                    return RedirectToAction("ActionFailed", "ActivityTypes");
+                }
             }
             return View(activityType);
         }
@@ -92,7 +99,7 @@ namespace MVCClient.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ActivityTypeId,Description")] ActivityType activityType)
+        public async Task<IActionResult> Edit(int id, [Bind("ActivityTypeId,Description")] ActivityTypes activityType)
         {
             if (id != activityType.ActivityTypeId)
             {
@@ -145,10 +152,22 @@ namespace MVCClient.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var activityType = await _context.ActivityType.FindAsync(id);
-            _context.ActivityType.Remove(activityType);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var activityType = await _context.ActivityType.FindAsync(id);
+                _context.ActivityType.Remove(activityType);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction("ActionFailed", "ActivityTypes");
+            }
+        }
+
+        public IActionResult ActionFailed()
+        {
+            return View();
         }
 
         private bool ActivityTypeExists(int id)

@@ -54,19 +54,26 @@ namespace MVCClient.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CustomerTypeId,Description")] CustomerType customerType)
+        public async Task<IActionResult> Create([Bind("CustomerTypeId,Description")] CustomerTypes customerType)
         {
             //If the Activity type the user tries to enter already exists we don't update the database and we just return to the index page
-            if (CustomerTypeExistsDesc(customerType.Description))
+            if (CustomerTypeExistsByDesc(customerType.Description))
             {
                 return RedirectToAction("Index", "CustomerTypes");
             }
 
             if (ModelState.IsValid)
             {
-                _context.Add(customerType);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(customerType);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch
+                {
+                    return RedirectToAction("ActionFailed", "CustomerTypes");
+                }
             }
             return View(customerType);
         }
@@ -92,7 +99,7 @@ namespace MVCClient.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CustomerTypeId,Description")] CustomerType customerType)
+        public async Task<IActionResult> Edit(int id, [Bind("CustomerTypeId,Description")] CustomerTypes customerType)
         {
             if (id != customerType.CustomerTypeId)
             {
@@ -145,10 +152,22 @@ namespace MVCClient.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var customerType = await _context.CustomerType.FindAsync(id);
-            _context.CustomerType.Remove(customerType);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var customerType = await _context.CustomerType.FindAsync(id);
+                _context.CustomerType.Remove(customerType);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction("ActionFailed", "CustomerTypes");
+            }
+        }
+
+        public IActionResult ActionFailed()
+        {
+            return View();
         }
 
         private bool CustomerTypeExists(int id)
@@ -156,7 +175,7 @@ namespace MVCClient.Controllers
             return _context.CustomerType.Any(e => e.CustomerTypeId == id);
         }
 
-        private bool CustomerTypeExistsDesc(string Description)
+        private bool CustomerTypeExistsByDesc(string Description)
         {
             return _context.CustomerType.Any(e => e.Description == Description);
         }

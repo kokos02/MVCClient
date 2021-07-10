@@ -25,9 +25,13 @@ namespace MVCClient.Controllers
             var ActivitiesToSearch = from Activities in _context.Activities
                                     select Activities;
 
+            ActivitiesToSearch = ActivitiesToSearch.Include(c => c.ActivityType);
+            ActivitiesToSearch = ActivitiesToSearch.Include(c => c.Customer);
+
             if (!String.IsNullOrEmpty(searchString))
             {
-                ActivitiesToSearch = ActivitiesToSearch.Where(s => (s.Description.Contains(searchString)));
+                ActivitiesToSearch = ActivitiesToSearch.Where(s => (s.Description.Contains(searchString)) 
+                || (s.Customer.Name.Contains(searchString)) || (s.ActivityType.Description.Contains(searchString)));
                 return View(await ActivitiesToSearch.ToListAsync());
             }
 
@@ -58,7 +62,7 @@ namespace MVCClient.Controllers
         // GET: Activities/Create
         public IActionResult Create()
         {
-            ViewData["ActivityTypeId"] = new SelectList(_context.Set<ActivityType>(), "ActivityTypeId", "Description");
+            ViewData["ActivityTypeId"] = new SelectList(_context.Set<ActivityTypes>(), "ActivityTypeId", "Description");
             ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "Name");
             return View();
         }
@@ -72,11 +76,18 @@ namespace MVCClient.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(activities);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(activities);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch
+                {
+                    return RedirectToAction("ActionFailed", "Activities");
+                }
             }
-            ViewData["ActivityTypeId"] = new SelectList(_context.Set<ActivityType>(), "ActivityTypeId", "Description", activities.ActivityTypeId);
+            ViewData["ActivityTypeId"] = new SelectList(_context.Set<ActivityTypes>(), "ActivityTypeId", "Description", activities.ActivityTypeId);
             ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "Address", activities.CustomerId);
             return View(activities);
         }
@@ -94,7 +105,7 @@ namespace MVCClient.Controllers
             {
                 return NotFound();
             }
-            ViewData["ActivityTypeId"] = new SelectList(_context.Set<ActivityType>(), "ActivityTypeId", "Description", activities.ActivityTypeId);
+            ViewData["ActivityTypeId"] = new SelectList(_context.Set<ActivityTypes>(), "ActivityTypeId", "Description", activities.ActivityTypeId);
             ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "Address", activities.CustomerId);
             return View(activities);
         }
@@ -131,7 +142,7 @@ namespace MVCClient.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ActivityTypeId"] = new SelectList(_context.Set<ActivityType>(), "ActivityTypeId", "Description", activities.ActivityTypeId);
+            ViewData["ActivityTypeId"] = new SelectList(_context.Set<ActivityTypes>(), "ActivityTypeId", "Description", activities.ActivityTypeId);
             ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "Address", activities.CustomerId);
             return View(activities);
         }
@@ -161,10 +172,22 @@ namespace MVCClient.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var activities = await _context.Activities.FindAsync(id);
-            _context.Activities.Remove(activities);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var activities = await _context.Activities.FindAsync(id);
+                _context.Activities.Remove(activities);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return RedirectToAction("ActionFailed", "Activities");
+            }
+        }
+
+        public IActionResult ActionFailed()
+        {
+            return View();
         }
 
         private bool ActivitiesExists(int id)

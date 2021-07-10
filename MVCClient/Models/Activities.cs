@@ -28,6 +28,6 @@ namespace MVCClient.Models
         public int ActivityTypeId { get; set; }
 
         [ForeignKey(nameof(ActivityTypeId))]
-        public virtual ActivityType ActivityType { get; set; }
+        public virtual ActivityTypes ActivityType { get; set; }
     }
 }
