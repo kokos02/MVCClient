@@ -56,6 +56,12 @@ namespace MVCClient.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CustomerTypeId,Description")] CustomerType customerType)
         {
+            //If the Activity type the user tries to enter already exists we don't update the database and we just return to the index page
+            if (CustomerTypeExistsDesc(customerType.Description))
+            {
+                return RedirectToAction("Index", "CustomerTypes");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(customerType);
@@ -148,6 +154,11 @@ namespace MVCClient.Controllers
         private bool CustomerTypeExists(int id)
         {
             return _context.CustomerType.Any(e => e.CustomerTypeId == id);
+        }
+
+        private bool CustomerTypeExistsDesc(string Description)
+        {
+            return _context.CustomerType.Any(e => e.Description == Description);
         }
     }
 }
