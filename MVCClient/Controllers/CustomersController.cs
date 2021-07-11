@@ -70,7 +70,7 @@ namespace MVCClient.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CustomerId,Name,Address,CustomerTypeId")] Customers customer)
+        public async Task<IActionResult> Create([Bind("CustomerId,Name,Address,CustomerTypeId")] CustomersDto customer)
         {
             if (ModelState.IsValid)
             {
