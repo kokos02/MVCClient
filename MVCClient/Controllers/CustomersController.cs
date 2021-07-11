@@ -27,6 +27,7 @@ namespace MVCClient.Controllers
                                     select customers;
 
             customersList = customersList.Include(c => c.CustomerType);
+            customersList = customersList.Include(c => c.Activities);
 
             if (!String.IsNullOrEmpty(searchString))
             {
@@ -70,7 +71,7 @@ namespace MVCClient.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CustomerId,Name,Address,CustomerTypeId")] CustomersDto customer)
+        public async Task<IActionResult> Create([Bind("CustomerId,Name,Address,CustomerTypeId")] Customers customer)
         {
             if (ModelState.IsValid)
             {
@@ -98,11 +99,14 @@ namespace MVCClient.Controllers
             }
 
             var customer = await _context.Customer.FindAsync(id);
+            
             if (customer == null)
             {
                 return NotFound();
             }
+
             ViewData["CustomerTypeId"] = new SelectList(_context.Set<CustomerTypes>(), "CustomerTypeId", "Description", customer.CustomerTypeId);
+           
             return View(customer);
         }
 
