@@ -55,9 +55,9 @@
                 @Html.DisplayFor(modelItem => item.ActivityType.Description)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ActivitiesId">Edit</a> |
+                <a asp-action="Edit" asp-route-id="@item.ActivitiesId">Edit</a> 
                 @*<a asp-action="Details" asp-route-id="@item.ActivitiesId">Details</a> |        Uncomment to give the option to redirect to details page*@
-                <a asp-action="Delete" asp-route-id="@item.ActivitiesId">Delete</a>
+                @*<a asp-action="Delete" asp-route-id="@item.ActivitiesId">Delete</a>            Uncomment to give the option to redirect to delete page*@
             </td>
         </tr>
 }

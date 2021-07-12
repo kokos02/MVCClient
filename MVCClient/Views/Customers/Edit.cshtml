@@ -32,13 +32,61 @@
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
+
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<h2>@Model.Name's Activities</h2>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Description
+            </th>
+            <th>
+                Start Date
+            </th>
+            <th>
+                End Date
+            </th>
+            <th>
+                Activity Type
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @*-------------------------------------------------------------------------------------*@
+        @foreach (var item in ViewData["Activities"] as IEnumerable<MVCClient.Models.Activities>)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ActivityType.Description)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-controller="Activities" asp-route-id="@item.ActivitiesId">Edit</a> 
+                    @*<a asp-action="Details" asp-controller="Activities" asp-route-id="@item.ActivitiesId">Details</a> |        Uncomment to give the option to redirect to details page*@
+                    @*<a asp-action="Delete" asp-controller="Activities" asp-route-id="@item.ActivitiesId">Delete</a>            Uncomment to give the option to redirect to delete page*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+    @*-------------------------------------------------------------------------------------*@
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }

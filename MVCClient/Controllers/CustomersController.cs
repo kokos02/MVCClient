@@ -99,6 +99,18 @@ namespace MVCClient.Controllers
             }
 
             var customer = await _context.Customer.FindAsync(id);
+            List<Activities> activities = new List<Activities>();
+
+            foreach (var item in _context.Activities.Include(c => c.ActivityType))
+            {
+                if (item.CustomerId == id)
+                {
+                    activities.Add(item);
+                } 
+            }
+            
+
+            
             
             if (customer == null)
             {
@@ -106,6 +118,7 @@ namespace MVCClient.Controllers
             }
 
             ViewData["CustomerTypeId"] = new SelectList(_context.Set<CustomerTypes>(), "CustomerTypeId", "Description", customer.CustomerTypeId);
+            ViewData["Activities"] = activities;
            
             return View(customer);
         }
